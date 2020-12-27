@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Biblioteka</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/style.css') }}">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+</head>
+<body>
+{% include 'menu.html' %}
+<div>
+    <table class="table">
+        <thead>
+        <tr>
+            <th scope="col"></th>
+            <th scope="col">Nazwa</th>
+            <th scope="col"></th>
+            <th scope="col"></th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for author in authors %}
+        <tr>
+            <th scope="row">{{loop.index}}</th>
+            <td>{{author[1]}}</td>
+            <td>
+                <a class="btn btn-secondary btn-sm" href="http://127.0.0.1:5000/authors/display_book/{{author[0]}}"
+                   role="button">Ksiązki</a>
+                <a class="btn btn-secondary btn-sm" href="http://127.0.0.1:5000/change_authors/{{author[0]}}"
+                   role="button">Zmień</a>
+                <a class="btn btn-secondary btn-sm" href="http://127.0.0.1:5000/delete_authors/{{author[0]}}"
+                   role="button">Usuń</a>
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+</body>
+</html>
