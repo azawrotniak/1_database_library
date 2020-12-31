@@ -68,7 +68,6 @@
 .menu-bar ul li:hover .sub-menu-1 ul li a:hover {
     color: #b2ff00;
 }
-.head-1 {
-    background: rgb(0, 100, 0);
+.header-1{
     text-align: center;
 }

@@ -1,6 +1,7 @@
 from flask import Flask, request, render_template
 from psycopg2 import connect, OperationalError
 from psycopg2._psycopg import ProgrammingError
+import datetime
 
 app = Flask(__name__)
 
@@ -18,6 +19,24 @@ def execute_sql(sql_code, parametr=None):
         conn.autocommit = True
         cursor = conn.cursor()
         cursor.execute(sql_code, (parametr,))
+        results = cursor.fetchall()
+        cursor.close()
+        conn.close()
+    except OperationalError as err:
+        print('err')
+    except ProgrammingError as err:
+        print('err')
+    return results
+
+
+def search_id_client(sql_code, first_name, last_name):
+    try:
+        conn = connect(
+            user=username, password=password, host=hostname, database=database
+        )
+        conn.autocommit = True
+        cursor = conn.cursor()
+        cursor.execute(sql_code, (first_name, last_name))
         results = cursor.fetchall()
         cursor.close()
         conn.close()
@@ -108,6 +127,22 @@ def add_category(sql_code, name):
         print('No results')
 
 
+def loan_book(sql_code, id_book, id_client, loan_date):
+    try:
+        conn = connect(
+            user=username, password=password, host=hostname, database=database
+        )
+        conn.autocommit = True
+        cursor = conn.cursor()
+        cursor.execute(sql_code, (id_book, id_client, loan_date))
+        cursor.close()
+        conn.close()
+    except OperationalError as err:
+        print(err)
+    except ProgrammingError:
+        print('No results')
+
+
 @app.route('/', methods=['GET'])
 def display_main():
     return render_template('main.html')
@@ -128,6 +163,7 @@ def display_books():
 def display_clients():
     sql_code = 'select * from client;'
     client_list = execute_sql(sql_code)
+    print(client_list)
     return render_template('clients.html', clients=client_list)
 
 
@@ -204,7 +240,6 @@ def new_category():
 def details_book(id):
     if request.method == 'GET':
         sql_code = f'select * from book where id=%s;'
-        print(sql_code)
         details_list = execute_sql(sql_code, id)
         details = details_list[0]
         return render_template('form_add_book.html', details=details)
@@ -262,10 +297,38 @@ def delete_author(id):
 def details_client(id):
     if request.method == 'GET':
         sql_code = f'select * from client where id=%s;'
-        print(sql_code)
         details_list = execute_sql(sql_code, id)
         details = details_list[0]
         return render_template('form_add_client.html', details=details)
+
+
+@app.route('/loan_book', methods=['GET', 'POST'])
+def new_loan():
+    if request.method == 'GET':
+        return render_template('form_loan_book.html')
+    else:
+        sql_code = 'select id from book where name=%s;'
+        name = request.form.get('title_book')
+        id_book = execute_sql(sql_code, (name,))
+        if id_book == []:
+            massage = 'Brak ksiązki o takim tytule'
+            return render_template('main.html', massage=massage)
+        id_book = id_book[0][0]
+
+        sql_code = 'select id from client where first_name=%s and last_name=%s;'
+        first_name = request.form.get('first_name')
+        last_name = request.form.get('last_name')
+        id_client = search_id_client(sql_code, first_name, last_name)
+        if id_client == []:
+            massage = 'Brak takiego użytkownika'
+            return render_template('main.html', massage=massage)
+        id_client = id_client[0][0]
+
+        loan_date = str(datetime.datetime.today())
+        sql_code = 'Insert into book_clients (id_book, id_client, loan_date) values(%s,%s,%s);'
+        loan_book(sql_code, id_book, id_client, loan_date)
+
+        return render_template('form_loan_book.html')
 
 
 app.run()

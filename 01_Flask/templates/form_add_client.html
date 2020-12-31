@@ -20,11 +20,11 @@
 {% elif details %}
 <form class="add_client" method="POST" action="">
     <div id="main">
-        <div id="child_1">
+        <div>
             <label>Imię</label><br>
             <input name="first_name" type="text" maxlength="255" value="{{details[1]}}"/><br>
         </div>
-        <div id="child_2">
+        <div>
             <label>Nazwisko</label><br>
             <input name="last_name" type="text" maxlength="255" value="{{details[2]}}"/><br>
             <a class="btn btn-secondary btn-sm" href="http://127.0.0.1:5000/clients" role="button">Ok</a>
@@ -32,7 +32,7 @@
     </div>
 </form>
 <div>
-    <div class="head-1"><h1>Wypożyczone książki</h1><br></div>
+    <div class="header-1"><h1>Wypożyczone książki</h1><br></div>
     <table class="table">
         <thead>
         <tr>
@@ -41,6 +41,7 @@
             <th scope="col">Opis</th>
             <th scope="col">Autor</th>
             <th scope="col">Kategoria</th>
+            <th scope="col">Data wypożyczenia</th>
             <th scope="col"></th>
         </tr>
         </thead>
@@ -54,8 +55,7 @@
             <td>{{book[4]}}</td>
             <td>
                 <a class="btn btn-secondary btn-sm" href="http://127.0.0.1:5000/book_details/{{book[0]}}" role="button">Szczegóły</a>
-                <a class="btn btn-secondary btn-sm" href="http://127.0.0.1:5000/change_book/{{book[0]}}" role="button">Zmień</a>
-                <a class="btn btn-secondary btn-sm" href="http://127.0.0.1:5000/delete_book/{{book[0]}}" role="button">Usuń</a>
+                <a class="btn btn-secondary btn-sm" href="http://127.0.0.1:5000/return_book/{{book[0]}}" role="button">Zwróć książkę</a>
             </td>
         </tr>
         {% endfor %} -->
