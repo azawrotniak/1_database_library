@@ -143,6 +143,38 @@ def loan_book(sql_code, id_book, id_client, loan_date):
         print('No results')
 
 
+def return_book(sql_code, return_date, id):
+    try:
+        conn = connect(
+            user=username, password=password, host=hostname, database=database
+        )
+        conn.autocommit = True
+        cursor = conn.cursor()
+        cursor.execute(sql_code, (return_date, id))
+        cursor.close()
+        conn.close()
+    except OperationalError as err:
+        print(err)
+    except ProgrammingError:
+        print('No results')
+
+
+def update_book_loan(sql_code, id_client, id_book):
+    try:
+        conn = connect(
+            user=username, password=password, host=hostname, database=database
+        )
+        conn.autocommit = True
+        cursor = conn.cursor()
+        cursor.execute(sql_code, (id_client, id_book))
+        cursor.close()
+        conn.close()
+    except OperationalError as err:
+        print(err)
+    except ProgrammingError:
+        print('No results')
+
+
 @app.route('/', methods=['GET'])
 def display_main():
     return render_template('main.html')
@@ -205,7 +237,8 @@ def new_book():
 @app.route('/add_client', methods=['GET', 'POST'])
 def new_client():
     if request.method == 'GET':
-        return render_template('form_add_client.html')
+        added = True
+        return render_template('form_add_client.html', added=added)
     else:
         sql_code = 'Insert into client (first_name,last_name) values(%s,%s);'
         first_name = request.form.get('first_name')
@@ -296,10 +329,20 @@ def delete_author(id):
 @app.route('/details_client/<id>', methods=['GET'])
 def details_client(id):
     if request.method == 'GET':
-        sql_code = f'select * from client where id=%s;'
+        sql_code = f"""select c.id, c.first_name, c.last_name, b2.id as book_id, b2.name, b2.description, a2.name as author, c2.name as category, bc2.loan_date, bc2.id as id_loan from client c
+            left join book_clients bc2 on bc2.id_client = c.id 
+            left join book b2 on b2.id =bc2.id_book 
+            left join author a2 on a2.id= b2.id_author
+            left join book_category bc ON bc.id_book =b2.id
+            left join category c2 on bc.id_category = c2.id
+            where c.id=%s and bc2.return_date is null;
+            """
         details_list = execute_sql(sql_code, id)
-        details = details_list[0]
-        return render_template('form_add_client.html', details=details)
+        sql_code = "select * from client where id=%s;"
+        details = execute_sql(sql_code, id)
+        details = details[0]
+
+        return render_template('form_add_client.html', details=details, details_list=details_list)
 
 
 @app.route('/loan_book', methods=['GET', 'POST'])
@@ -327,8 +370,16 @@ def new_loan():
         loan_date = str(datetime.datetime.today())
         sql_code = 'Insert into book_clients (id_book, id_client, loan_date) values(%s,%s,%s);'
         loan_book(sql_code, id_book, id_client, loan_date)
-
         return render_template('form_loan_book.html')
+
+
+@app.route('/return_book/<id>', methods=['GET'])
+def new_return(id):
+    if request.method == 'GET':
+        return_date = str(datetime.datetime.today())
+        sql_code = f"update book_clients set return_date=%s where id=%s;"
+        return_book(sql_code, return_date, id)
+        return render_template('main.html')
 
 
 app.run()

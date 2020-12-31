@@ -46,19 +46,20 @@
         </tr>
         </thead>
         <tbody>
-        <!--{% for book in books %}
+        {% for detail in details_list %}
         <tr>
             <th scope="row">{{loop.index}}</th>
-            <td>{{book[1]}}</td>
-            <td>{{book[2]}}</td>
-            <td>{{book[3]}}</td>
-            <td>{{book[4]}}</td>
+            <td>{{detail[4]}}</td>
+            <td>{{detail[5]}}</td>
+            <td>{{detail[6]}}</td>
+            <td>{{detail[7]}}</td>
+            <td>{{detail[8]}}</td>
             <td>
-                <a class="btn btn-secondary btn-sm" href="http://127.0.0.1:5000/book_details/{{book[0]}}" role="button">Szczegóły</a>
-                <a class="btn btn-secondary btn-sm" href="http://127.0.0.1:5000/return_book/{{book[0]}}" role="button">Zwróć książkę</a>
+                <a class="btn btn-secondary btn-sm" href="http://127.0.0.1:5000/book_details/{{detail[3]}}" role="button">Szczegóły</a>
+                <a class="btn btn-secondary btn-sm" href="http://127.0.0.1:5000/return_book/{{detail[9]}}" role="button">Zwróć książkę</a>
             </td>
         </tr>
-        {% endfor %} -->
+        {% endfor %}
         </tbody>
     </table>
 </div>
