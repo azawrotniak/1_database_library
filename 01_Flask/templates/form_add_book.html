@@ -11,6 +11,7 @@
 <body>
 {% include 'menu.html' %}
 {% if add %}
+    <div class="pos_form">
 <form class="add_book" method="POST" action="">
     <label>ISBN</label><br>
     <input name="ISBN" type="text" maxlength="255" value=""/><br>
@@ -19,7 +20,7 @@
     <label>Opis</label><br>
     <input name="description" type="text" maxlength="255" value=""/><br>
     <label>Autor</label><br>
-    <input name="description" type="text" maxlength="255" value=""/><br>
+    <input name="name_author" type="text" maxlength="255" value=""/><br>
     <button class="btn btn-secondary btn-sm"
     " type="submit">Dodaj</button>
 </form>
@@ -32,7 +33,7 @@
     <label>Opis</label><br>
     <input name="description" type="text" maxlength="255" value="{{details[3]}}"/><br>
     <label>Autor</label><br>
-    <input name="description" type="text" maxlength="255" value=""/><br>
+    <input name="name_author" type="text" maxlength="255" value="{{details[4]}}"/><br>
     <button class="btn btn-secondary btn-sm"
     " type="submit">Zmień</button>
 </form>
@@ -45,9 +46,10 @@
     <label>Opis</label><br>
     <input name="description" type="text" maxlength="255" value="{{details[3]}}"/><br>
     <label>Autor</label><br>
-    <input name="description" type="text" maxlength="255" value=""/><br>
+    <input name="name_author" type="text" maxlength="255" value="{{details[4]}}"/><br>
     <a class="btn btn-secondary btn-sm" href="http://127.0.0.1:5000/books" role="button">Ok</a>
 </form>
-{% endif %}`
+{% endif %}
+</div>
 </body>
 </html>

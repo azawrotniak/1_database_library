@@ -63,14 +63,14 @@ def delete_item(sql_code, id):
         print('No results')
 
 
-def add_book(sql_code, ISBN, name, description):
+def add_book(sql_code, ISBN, name, description, id_author):
     try:
         conn = connect(
             user=username, password=password, host=hostname, database=database
         )
         conn.autocommit = True
         cursor = conn.cursor()
-        cursor.execute(sql_code, (ISBN, name, description))
+        cursor.execute(sql_code, (ISBN, name, description, id_author))
         cursor.close()
         conn.close()
     except OperationalError as err:
@@ -175,14 +175,14 @@ def update_book_loan(sql_code, id_client, id_book):
         print('No results')
 
 
-def update_book(sql_code, ISBN, name, description, id):
+def update_book(sql_code, ISBN, name, description, id_author, id):
     try:
         conn = connect(
             user=username, password=password, host=hostname, database=database
         )
         conn.autocommit = True
         cursor = conn.cursor()
-        cursor.execute(sql_code, (ISBN, name, description, id))
+        cursor.execute(sql_code, (ISBN, name, description, id_author, id))
         cursor.close()
         conn.close()
     except OperationalError as err:
@@ -239,6 +239,38 @@ def assign_category(sql_code, id_book, id_category):
         print('No results')
 
 
+def update_assign_category(sql_code, id_category, id_book):
+    try:
+        conn = connect(
+            user=username, password=password, host=hostname, database=database
+        )
+        conn.autocommit = True
+        cursor = conn.cursor()
+        cursor.execute(sql_code, (id_category, id_book))
+        cursor.close()
+        conn.close()
+    except OperationalError as err:
+        print(err)
+    except ProgrammingError:
+        print('No results')
+
+
+def update_category(sql_code, name, id):
+    try:
+        conn = connect(
+            user=username, password=password, host=hostname, database=database
+        )
+        conn.autocommit = True
+        cursor = conn.cursor()
+        cursor.execute(sql_code, (name, id))
+        cursor.close()
+        conn.close()
+    except OperationalError as err:
+        print(err)
+    except ProgrammingError:
+        print('No results')
+
+
 @app.route('/', methods=['GET'])
 def display_main():
     return render_template('main.html')
@@ -250,14 +282,14 @@ def display_books():
         left join author a on a.id=b.id_author 
         left join book_category bc ON bc.id_book =b.id
         left join category c on bc.id_category = c.id
-        order by b.id;"""
+        order by b.name;"""
     book_list = execute_sql(sql_code)
     return render_template('books.html', books=book_list)
 
 
 @app.route('/clients', methods=['GET'])
 def display_clients():
-    sql_code = 'select * from client;'
+    sql_code = 'select * from client order by first_name,last_name;'
     client_list = execute_sql(sql_code)
     print(client_list)
     return render_template('clients.html', clients=client_list)
@@ -265,7 +297,7 @@ def display_clients():
 
 @app.route('/authors', methods=['GET'])
 def display_authors():
-    sql_code = 'select * from author;'
+    sql_code = 'select * from author order by name;'
     author_list = execute_sql(sql_code)
     return render_template('authors.html', authors=author_list)
 
@@ -274,14 +306,16 @@ def display_authors():
 def delete_book(id):
     sql_code = f'delete from book where id={id};'
     delete_item(sql_code, id)
-    return render_template('main.html')
+    massage = 'Pozycja została usunieta'
+    return render_template('main.html', massage=massage)
 
 
 @app.route('/delete_client/<id>', methods=['GET'])
 def delete_client(id):
     sql_code = f'delete from client where id={id};'
     delete_item(sql_code, id)
-    return render_template('main.html')
+    massage = 'Pozycja została usunieta'
+    return render_template('main.html', massage=massage)
 
 
 @app.route('/add_book', methods=['GET', 'POST'])
@@ -290,12 +324,20 @@ def new_book():
         add = True
         return render_template('form_add_book.html', add=add)
     else:
-        sql_code = 'Insert into book (ISBN,name,description) values(%s,%s,%s);'
+        name_author = request.form.get('name_author')
+        sql_code = 'Select id from author where name=%s;'
+        id_author = execute_sql(sql_code, name_author)
+        if id_author == []:
+            massage = 'Brak autora w bazie danych'
+            return render_template('main.html', massage=massage)
+        id_author = id_author[0]
+        sql_code = 'Insert into book (ISBN,name,description,id_author) values(%s,%s,%s,%s);'
         ISBN = request.form.get('ISBN')
         name = request.form.get('name')
         description = request.form.get('description')
-        add_book(sql_code, ISBN, name, description)
-        return render_template('main.html')
+        add_book(sql_code, ISBN, name, description, id_author)
+        massage = 'Dodano pozycję'
+        return render_template('main.html', massage=massage)
 
 
 @app.route('/add_client', methods=['GET', 'POST'])
@@ -335,6 +377,22 @@ def new_category():
         return render_template('main.html')
 
 
+@app.route('/category/change_category/<id>', methods=['GET', 'POST'])
+def change_category(id):
+    if request.method == 'GET':
+        change = True
+        sql_code = 'Select id, name from category where id=%s;'
+        details_list = execute_sql(sql_code, id)
+        details = details_list[0]
+        return render_template('form_add_category.html', change=change, details=details)
+    else:
+        sql_code = 'update category set name = %s where id = %s;'
+        name = request.form.get('name')
+        update_category(sql_code, name, id)
+        massage = 'Zaktualizowano'
+        return render_template('main.html', massage=massage)
+
+
 @app.route('/assign_category/<id>', methods=['GET', 'POST'])
 def book_category(id):
     if request.method == 'GET':
@@ -347,9 +405,16 @@ def book_category(id):
         if id_category == []:
             massage = 'Brak podanej kategorii'
             return render_template('main.html', massage=massage)
+
         id_category = id_category[0]
-        sql_code = 'insert into book_category (id_book, id_category) values (%s,%s);'
-        assign_category(sql_code, id, id_category)
+        sql_code = f'select id_book from book_category where id_book = %s;'
+        is_assing_category = execute_sql(sql_code, id)
+        if is_assing_category != []:
+            sql_code = 'update book_category set  id_category =%s where id_book = %s;'
+            update_assign_category(sql_code, id_category, id)
+        else:
+            sql_code = 'insert into book_category (id_book, id_category) values (%s,%s);'
+            assign_category(sql_code, id, id_category)
         massage = 'Przypisano kategorię'
         return render_template('main.html', massage=massage)
 
@@ -357,7 +422,9 @@ def book_category(id):
 @app.route('/book_details/<id>', methods=['GET'])
 def details_book(id):
     if request.method == 'GET':
-        sql_code = f'select * from book where id=%s;'
+        sql_code = f"""select book.id, isbn, book.name, book.description, author.name from book
+            left join author on author.id = book.id_author
+            where book.id=%s;"""
         details_list = execute_sql(sql_code, id)
         details = details_list[0]
         return render_template('form_add_book.html', details=details)
@@ -367,16 +434,25 @@ def details_book(id):
 def change_book(id):
     if request.method == 'GET':
         change = True
-        sql_code = f'select * from book where id=%s;'
+        sql_code = f"""select book.id, isbn, book.name, book.description, author.name from book
+            left join author on author.id = book.id_author
+            where book.id=%s;"""
         details_list = execute_sql(sql_code, id)
         details = details_list[0]
         return render_template('form_add_book.html', change=change, details=details)
     else:
+        name_author = request.form.get('name_author')
+        sql_code = 'Select id from author where name=%s;'
+        id_author = execute_sql(sql_code, name_author)
+        if id_author == []:
+            massage = 'Brak autora w bazie danych'
+            return render_template('main.html', massage=massage)
+        id_author = id_author[0]
         ISBN = request.form.get('ISBN')
         name = request.form.get('name')
         description = request.form.get('description')
-        sql_code = f'update book set isbn=%s, name= %s, description = %s where id=%s;'
-        update_book(sql_code, ISBN, name, description, id)
+        sql_code = f'update book set isbn=%s, name= %s, description = %s, id_author=%s where id=%s;'
+        update_book(sql_code, ISBN, name, description, id_author, id)
         massage = "Zakualizowano dane"
         return render_template('main.html', massage=massage)
 
@@ -389,7 +465,7 @@ def authors_book(id):
             left join book_category bc ON bc.id_book =b.id
             left join category c on bc.id_category = c.id
             where a.id = %s
-            order by b.id;"""
+            order by b.name;"""
         book_list = execute_sql(sql_code, id)
         return render_template('books.html', books=book_list)
 
@@ -397,7 +473,7 @@ def authors_book(id):
 @app.route('/category', methods=['GET'])
 def category():
     if request.method == 'GET':
-        sql_code = f'select * from category;'
+        sql_code = f'select * from category order by name;'
         category_list = execute_sql(sql_code)
         return render_template('category.html', categories=category_list)
 
@@ -410,7 +486,7 @@ def category_book(id):
             left join book_category bc ON bc.id_book =b.id
             left join category c on bc.id_category = c.id
             where c.id = %s
-            order by b.id;"""
+            order by b.name;"""
         book_list = execute_sql(sql_code, id)
         return render_template('books.html', books=book_list)
 
@@ -442,7 +518,8 @@ def change_authors(id):
 def delete_author(id):
     sql_code = f'delete from author where id={id};'
     delete_item(sql_code, id)
-    return render_template('main.html')
+    massage = 'usunięto pozycję'
+    return render_template('main.html', massage=massage)
 
 
 @app.route('/details_client/<id>', methods=['GET'])
@@ -454,7 +531,8 @@ def details_client(id):
             left join author a2 on a2.id= b2.id_author
             left join book_category bc ON bc.id_book =b2.id
             left join category c2 on bc.id_category = c2.id
-            where c.id=%s and bc2.return_date is null;
+            where c.id=%s and bc2.return_date is null
+            order by c.first_name;
             """
         details_list = execute_sql(sql_code, id)
         sql_code = "select * from client where id=%s;"
@@ -533,7 +611,8 @@ def list_loan_book():
             left join author a2 on a2.id= b2.id_author
             left join book_category bc ON bc.id_book =b2.id
             left join category c2 on bc.id_category = c2.id
-            where bc2.return_date is null;
+            where bc2.return_date is null
+            order by loan_date;
             """
         details_list = execute_sql(sql_code, id)
         return render_template('loaned_books.html', details_list=details_list)
