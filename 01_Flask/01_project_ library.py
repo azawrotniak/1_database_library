@@ -382,4 +382,19 @@ def new_return(id):
         return render_template('main.html')
 
 
+@app.route('/list_loan_book', methods=['GET'])
+def list_loan_book():
+    if request.method == 'GET':
+        sql_code = f"""select c.id, c.first_name, c.last_name, b2.id as book_id, b2.name, b2.description, a2.name as author, c2.name as category, bc2.loan_date, bc2.id as id_loan from client c
+            left join book_clients bc2 on bc2.id_client = c.id 
+            left join book b2 on b2.id =bc2.id_book 
+            left join author a2 on a2.id= b2.id_author
+            left join book_category bc ON bc.id_book =b2.id
+            left join category c2 on bc.id_category = c2.id
+            where bc2.return_date is null;
+            """
+        details_list = execute_sql(sql_code, id)
+        return render_template('loaned_books.html', details_list=details_list)
+
+
 app.run()

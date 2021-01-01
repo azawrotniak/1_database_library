@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Biblioteka</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='styles/style.css') }}">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+</head>
+<body>
+{% include 'menu.html' %}
+<div>
+    <div class="header-1"><h1>Wypożyczone książki</h1><br></div>
+    <table class="table">
+        <thead>
+        <tr>
+            <th scope="col"></th>
+            <th scope="col">Imię</th>
+            <th scope="col">Nazwisko</th>
+            <th scope="col">Tytuł</th>
+            <th scope="col">Opis</th>
+            <th scope="col">Autor</th>
+            <th scope="col">Kategoria</th>
+            <th scope="col">Data wypożyczenia</th>
+            <th scope="col"></th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for detail in details_list %}
+            <tr>
+                <th scope="row">{{ loop.index }}</th>
+                <td>{{ detail[1] }}</td>
+                <td>{{ detail[2] }}</td>
+                <td>{{ detail[4] }}</td>
+                <td>{{ detail[5] }}</td>
+                <td>{{ detail[6] }}</td>
+                <td>{{ detail[7] }}</td>
+                <td>{{ detail[8] }}</td>
+                <td>
+                    <a class="btn btn-secondary btn-sm" href="http://127.0.0.1:5000/book_details/{{ detail[3] }}"
+                       role="button">Szczegóły</a>
+                    <a class="btn btn-secondary btn-sm" href="http://127.0.0.1:5000/return_book/{{ detail[9] }}"
+                       role="button">Zwróć książkę</a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+</body>
+</html>
