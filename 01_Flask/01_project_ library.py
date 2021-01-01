@@ -223,6 +223,22 @@ def update_author(sql_code, name, id):
         print('No results')
 
 
+def assign_category(sql_code, id_book, id_category):
+    try:
+        conn = connect(
+            user=username, password=password, host=hostname, database=database
+        )
+        conn.autocommit = True
+        cursor = conn.cursor()
+        cursor.execute(sql_code, (id_book, id_category))
+        cursor.close()
+        conn.close()
+    except OperationalError as err:
+        print(err)
+    except ProgrammingError:
+        print('No results')
+
+
 @app.route('/', methods=['GET'])
 def display_main():
     return render_template('main.html')
@@ -310,12 +326,32 @@ def new_author():
 @app.route('/add_category', methods=['GET', 'POST'])
 def new_category():
     if request.method == 'GET':
-        return render_template('form_add_category.html')
+        add = True
+        return render_template('form_add_category.html', add=add)
     else:
         sql_code = 'Insert into category (name) values(%s);'
         name = request.form.get('name')
         add_author(sql_code, name)
         return render_template('main.html')
+
+
+@app.route('/assign_category/<id>', methods=['GET', 'POST'])
+def book_category(id):
+    if request.method == 'GET':
+        assign = True
+        return render_template('form_add_category.html', assign=assign)
+    else:
+        name = request.form.get('name')
+        sql_code = 'Select id from category where name=%s;'
+        id_category = execute_sql(sql_code, name)
+        if id_category == []:
+            massage = 'Brak podanej kategorii'
+            return render_template('main.html', massage=massage)
+        id_category = id_category[0]
+        sql_code = 'insert into book_category (id_book, id_category) values (%s,%s);'
+        assign_category(sql_code, id, id_category)
+        massage = 'Przypisano kategorię'
+        return render_template('main.html', massage=massage)
 
 
 @app.route('/book_details/<id>', methods=['GET'])

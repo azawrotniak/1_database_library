@@ -10,10 +10,20 @@
 </head>
 <body>
 {% include 'menu.html' %}
-<form class="add_client" method="POST" action="">
-    <label>Nazwa</label><br>
-    <input name="name" type="text" maxlength="255" value=""/><br>
-    <button type="submit" name="submit" value="category">Dodaj</button>
-</form>
+{% if add %}
+    <form class="category" method="POST" action="">
+        <label>Nazwa</label><br>
+        <input name="name" type="text" maxlength="255" value=""/><br>
+        <button class="btn btn-secondary btn-sm"
+        " type="submit">Dodaj</button>
+    </form>
+{% elif assign %}
+    <form class="category" method="POST" action="">
+        <label>Nazwa</label><br>
+        <input name="name" type="text" maxlength="255" value=""/><br>
+        <button class="btn btn-secondary btn-sm"
+        " type="submit">Przypisz</button>
+    </form>
+{% endif %}
 </body>
 </html>
