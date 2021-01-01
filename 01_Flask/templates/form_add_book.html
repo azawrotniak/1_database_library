@@ -28,11 +28,11 @@
 {% elif change %}
 <form class="add_book" method="POST" action="">
     <label>ISBN</label><br>
-    <input name="ISBN" type="text" maxlength="255" value=""/><br>
+    <input name="ISBN" type="text" maxlength="255" value="{{details[1]}}"/><br>
     <label>Nazwa</label><br>
-    <input name="name" type="text" maxlength="255" value=""/><br>
+    <input name="name" type="text" maxlength="255" value="{{details[2]}}"/><br>
     <label>Opis</label><br>
-    <input name="description" type="text" maxlength="255" value=""/><br>
+    <input name="description" type="text" maxlength="255" value="{{details[3]}}"/><br>
     <label>Autor</label><br>
     <input name="description" type="text" maxlength="255" value=""/><br>
     <label>Kategoria</label><br>

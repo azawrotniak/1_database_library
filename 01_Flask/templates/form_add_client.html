@@ -16,7 +16,17 @@
     <input name="first_name" type="text" maxlength="255" value=""/><br>
     <label>Nazwisko</label><br>
     <input name="last_name" type="text" maxlength="255" value=""/><br>
-    <button type="submit" name="submit" value="book">Dodaj</button>
+    <button class="btn btn-secondary btn-sm"
+    " type="submit">Dodaj</button>
+</form>
+{% elif change %}
+<form class="add_client" method="POST" action="">
+    <label>Imię</label><br>
+    <input name="first_name" type="text" maxlength="255" value="{{details[1]}}"/><br>
+    <label>Nazwisko</label><br>
+    <input name="last_name" type="text" maxlength="255" value="{{details[2]}}"/><br>
+    <button class="btn btn-secondary btn-sm"
+    " type="submit">Zmień</button>
 </form>
 {% elif details %}
 <form class="add_client" method="POST" action="">

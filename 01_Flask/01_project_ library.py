@@ -175,6 +175,54 @@ def update_book_loan(sql_code, id_client, id_book):
         print('No results')
 
 
+def update_book(sql_code, ISBN, name, description, id):
+    try:
+        conn = connect(
+            user=username, password=password, host=hostname, database=database
+        )
+        conn.autocommit = True
+        cursor = conn.cursor()
+        cursor.execute(sql_code, (ISBN, name, description, id))
+        cursor.close()
+        conn.close()
+    except OperationalError as err:
+        print(err)
+    except ProgrammingError:
+        print('No results')
+
+
+def update_client(sql_code, first_name, last_name, id):
+    try:
+        conn = connect(
+            user=username, password=password, host=hostname, database=database
+        )
+        conn.autocommit = True
+        cursor = conn.cursor()
+        cursor.execute(sql_code, (first_name, last_name, id))
+        cursor.close()
+        conn.close()
+    except OperationalError as err:
+        print(err)
+    except ProgrammingError:
+        print('No results')
+
+
+def update_author(sql_code, name, id):
+    try:
+        conn = connect(
+            user=username, password=password, host=hostname, database=database
+        )
+        conn.autocommit = True
+        cursor = conn.cursor()
+        cursor.execute(sql_code, (name, id))
+        cursor.close()
+        conn.close()
+    except OperationalError as err:
+        print(err)
+    except ProgrammingError:
+        print('No results')
+
+
 @app.route('/', methods=['GET'])
 def display_main():
     return render_template('main.html')
@@ -250,7 +298,8 @@ def new_client():
 @app.route('/add_author', methods=['GET', 'POST'])
 def new_author():
     if request.method == 'GET':
-        return render_template('form_add_author.html')
+        add = True
+        return render_template('form_add_author.html', add=add)
     else:
         sql_code = 'Insert into author (name) values(%s);'
         name = request.form.get('name')
@@ -276,6 +325,24 @@ def details_book(id):
         details_list = execute_sql(sql_code, id)
         details = details_list[0]
         return render_template('form_add_book.html', details=details)
+
+
+@app.route('/change_book/<id>', methods=['GET', 'POST'])
+def change_book(id):
+    if request.method == 'GET':
+        change = True
+        sql_code = f'select * from book where id=%s;'
+        details_list = execute_sql(sql_code, id)
+        details = details_list[0]
+        return render_template('form_add_book.html', change=change, details=details)
+    else:
+        ISBN = request.form.get('ISBN')
+        name = request.form.get('name')
+        description = request.form.get('description')
+        sql_code = f'update book set isbn=%s, name= %s, description = %s where id=%s;'
+        update_book(sql_code, ISBN, name, description, id)
+        massage = "Zakualizowano dane"
+        return render_template('main.html', massage=massage)
 
 
 @app.route('/authors/display_book/<id>', methods=['GET'])
@@ -319,6 +386,22 @@ def delete_category(id):
     return render_template('main.html')
 
 
+@app.route('/change_authors/<id>', methods=['GET', 'POST'])
+def change_authors(id):
+    if request.method == 'GET':
+        change = True
+        sql_code = f'select * from author where id=%s;'
+        details_list = execute_sql(sql_code, id)
+        details = details_list[0]
+        return render_template('form_add_author.html', change=change, details=details)
+    else:
+        name = request.form.get('name')
+        sql_code = f'update author set name=%s where id=%s;'
+        update_author(sql_code, name, id)
+        massage = "Zakualizowano dane"
+        return render_template('main.html', massage=massage)
+
+
 @app.route('/delete_authors/<id>', methods=['GET'])
 def delete_author(id):
     sql_code = f'delete from author where id={id};'
@@ -345,6 +428,23 @@ def details_client(id):
         return render_template('form_add_client.html', details=details, details_list=details_list)
 
 
+@app.route('/change_client/<id>', methods=['GET', 'POST'])
+def change_clients(id):
+    if request.method == 'GET':
+        change = True
+        sql_code = f'select * from client where id=%s;'
+        details_list = execute_sql(sql_code, id)
+        details = details_list[0]
+        return render_template('form_add_client.html', change=change, details=details)
+    else:
+        first_name = request.form.get('first_name')
+        last_name = request.form.get('last_name')
+        sql_code = f'update client set first_name=%s, last_name= %s where id=%s;'
+        update_client(sql_code, first_name, last_name, id)
+        massage = "Zakualizowano dane"
+        return render_template('main.html', massage=massage)
+
+
 @app.route('/loan_book', methods=['GET', 'POST'])
 def new_loan():
     if request.method == 'GET':
@@ -357,6 +457,12 @@ def new_loan():
             massage = 'Brak ksiązki o takim tytule'
             return render_template('main.html', massage=massage)
         id_book = id_book[0][0]
+
+        sql_code = 'select id_book from book_clients bc where id_book=%s and return_date is null ;'
+        is_loaned = execute_sql(sql_code, (id_book,))
+        if is_loaned != []:
+            massage = 'Książka jest wypożyczona'
+            return render_template('main.html', massage=massage)
 
         sql_code = 'select id from client where first_name=%s and last_name=%s;'
         first_name = request.form.get('first_name')
