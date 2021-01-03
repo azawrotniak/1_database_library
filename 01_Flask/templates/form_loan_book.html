@@ -10,15 +10,17 @@
 </head>
 <body>
 {% include 'menu.html' %}
-<form class="loan_book" method="POST" action="">
-    <label>Tytuł ksiązki</label><br>
-    <input name="title_book" type="text" maxlength="255" value=""/><br>
-    <label>Imię klineta</label><br>
-    <input name="first_name" type="text" maxlength="255" value=""/><br>
-    <label>Nazwisko klineta</label><br>
-    <input name="last_name" type="text" maxlength="255" value=""/><br>
-    <button class="btn btn-secondary btn-sm"
-    " type="submit">Dodaj</button>
-</form>
+<div class="pos_form">
+    <form class="loan_book" method="POST" action="">
+        <label>Tytuł ksiązki</label><br>
+        <input name="title_book" type="text" maxlength="255" value=""/><br>
+        <label>Imię klienta</label><br>
+        <input name="first_name" type="text" maxlength="255" value=""/><br>
+        <label>Nazwisko klienta</label><br>
+        <input name="last_name" type="text" maxlength="255" value=""/><br>
+        <button class="btn btn-secondary btn-sm"
+        " type="submit">Dodaj</button>
+    </form>
+</div>
 </body>
 </html>

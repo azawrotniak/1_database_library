@@ -10,71 +10,77 @@
 </head>
 <body>
 {% include 'menu.html' %}
-{% if added %}
-<form class="add_client" method="POST" action="">
-    <label>Imię</label><br>
-    <input name="first_name" type="text" maxlength="255" value=""/><br>
-    <label>Nazwisko</label><br>
-    <input name="last_name" type="text" maxlength="255" value=""/><br>
-    <button class="btn btn-secondary btn-sm"
-    " type="submit">Dodaj</button>
-</form>
-{% elif change %}
-<form class="add_client" method="POST" action="">
-    <label>Imię</label><br>
-    <input name="first_name" type="text" maxlength="255" value="{{details[1]}}"/><br>
-    <label>Nazwisko</label><br>
-    <input name="last_name" type="text" maxlength="255" value="{{details[2]}}"/><br>
-    <button class="btn btn-secondary btn-sm"
-    " type="submit">Zmień</button>
-</form>
-{% elif details %}
-<form class="add_client" method="POST" action="">
-    <div id="main">
-        <div>
-            <label>Imię</label><br>
-            <input name="first_name" type="text" maxlength="255" value="{{details[1]}}"/><br>
-        </div>
-        <div>
-            <label>Nazwisko</label><br>
-            <input name="last_name" type="text" maxlength="255" value="{{details[2]}}"/><br>
-            <a class="btn btn-secondary btn-sm" href="http://127.0.0.1:5000/clients" role="button">Ok</a>
-        </div>
-    </div>
-</form>
-<div>
-    <div class="header-1"><h1>Wypożyczone książki</h1><br></div>
-    <table class="table">
-        <thead>
-        <tr>
-            <th scope="col"></th>
-            <th scope="col">Tytuł</th>
-            <th scope="col">Opis</th>
-            <th scope="col">Autor</th>
-            <th scope="col">Kategoria</th>
-            <th scope="col">Data wypożyczenia</th>
-            <th scope="col"></th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for detail in details_list %}
-        <tr>
-            <th scope="row">{{loop.index}}</th>
-            <td>{{detail[4]}}</td>
-            <td>{{detail[5]}}</td>
-            <td>{{detail[6]}}</td>
-            <td>{{detail[7]}}</td>
-            <td>{{detail[8]}}</td>
-            <td>
-                <a class="btn btn-secondary btn-sm" href="http://127.0.0.1:5000/book_details/{{detail[3]}}" role="button">Szczegóły</a>
-                <a class="btn btn-secondary btn-sm" href="http://127.0.0.1:5000/return_book/{{detail[9]}}" role="button">Zwróć książkę</a>
-            </td>
-        </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-</div>
 
-{% endif %}
+    {% if added %}
+        <div class="pos_form">
+        <form class="add_client" method="POST" action="">
+            <label>Imię</label><br>
+            <input name="first_name" type="text" maxlength="255" value=""/><br>
+            <label>Nazwisko</label><br>
+            <input name="last_name" type="text" maxlength="255" value=""/><br>
+            <button class="btn btn-secondary btn-sm"
+            " type="submit">Dodaj</button>
+        </form>
+        </div>
+    {% elif change %}
+        <div class="pos_form">
+        <form class="add_client" method="POST" action="">
+            <label>Imię</label><br>
+            <input name="first_name" type="text" maxlength="255" value="{{ details[1] }}"/><br>
+            <label>Nazwisko</label><br>
+            <input name="last_name" type="text" maxlength="255" value="{{ details[2] }}"/><br>
+            <button class="btn btn-secondary btn-sm"
+            " type="submit">Zmień</button>
+        </form>
+        </div>
+    {% elif details %}
+        <form class="add_client" method="POST" action="">
+            <div>
+                <div>
+                    <label>Imię</label><br>
+                    <input name="first_name" type="text" maxlength="255" value="{{ details[1] }}"/><br>
+                </div>
+                <div>
+                    <label>Nazwisko</label><br>
+                    <input name="last_name" type="text" maxlength="255" value="{{ details[2] }}"/><br>
+                    <a class="btn btn-secondary btn-sm" href="http://127.0.0.1:5000/clients" role="button">Ok</a>
+                </div>
+            </div>
+        </form>
+        <div>
+            <div class="header-1"><h1>Wypożyczone książki</h1><br></div>
+            <table class="table">
+                <thead>
+                <tr>
+                    <th scope="col"></th>
+                    <th scope="col">Tytuł</th>
+                    <th scope="col">Opis</th>
+                    <th scope="col">Autor</th>
+                    <th scope="col">Kategoria</th>
+                    <th scope="col">Data wypożyczenia</th>
+                    <th scope="col"></th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for detail in details_list %}
+                    <tr>
+                        <th scope="row">{{ loop.index }}</th>
+                        <td>{{ detail[4] }}</td>
+                        <td>{{ detail[5] }}</td>
+                        <td>{{ detail[6] }}</td>
+                        <td>{{ detail[7] }}</td>
+                        <td>{{ detail[8] }}</td>
+                        <td>
+                            <a class="btn btn-secondary btn-sm"
+                               href="http://127.0.0.1:5000/book_details/{{ detail[3] }}" role="button">Szczegóły</a>
+                            <a class="btn btn-secondary btn-sm" href="http://127.0.0.1:5000/return_book/{{ detail[9] }}"
+                               role="button">Zwróć książkę</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
 </body>
 </html>

@@ -10,6 +10,7 @@
 </head>
 <body>
 {% include 'menu.html' %}
+<div class="pos_form">
 {% if add %}
     <form class="add_client" method="POST" action="">
         <label>Nazwa</label><br>
@@ -25,5 +26,6 @@
         " type="submit">Zmień</button>
     </form>
 {% endif %}
+</div>
 </body>
 </html>
